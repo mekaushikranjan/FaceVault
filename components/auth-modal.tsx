@@ -12,6 +12,7 @@ import { Loader2, Camera } from "lucide-react"
 import Link from "next/link"
 import { z } from "zod"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useToast } from "@/components/ui/use-toast"
 
 // Form validation schemas
 const loginSchema = z.object({
@@ -39,6 +40,7 @@ interface AuthModalProps {
 
 export function AuthModal({ isOpen, onClose, defaultTab = "login" }: AuthModalProps) {
   const { login, register } = useAuth()
+  const { toast } = useToast()
   const [activeTab, setActiveTab] = useState<"login" | "register">(defaultTab)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -79,6 +81,41 @@ export function AuthModal({ isOpen, onClose, defaultTab = "login" }: AuthModalPr
       onClose()
     } catch (error) {
       console.error("Login error:", error)
+      // Handle specific error cases
+      if (error instanceof Error) {
+        if (error.message.includes("Invalid credentials")) {
+          toast({
+            title: "Login Failed",
+            description: "Invalid email or password. Please check your credentials and try again.",
+            variant: "destructive",
+          })
+        } else if (error.message.includes("User not found")) {
+          toast({
+            title: "Account Not Found",
+            description: "No account found with this email address. Please check your email or register a new account.",
+            variant: "destructive",
+          })
+        } else if (error.message.includes("Incorrect password")) {
+          toast({
+            title: "Incorrect Password",
+            description: "The password you entered is incorrect. Please try again or use the forgot password option.",
+            variant: "destructive",
+          })
+        } else if (error.message.includes("Email not verified")) {
+          toast({
+            title: "Email Not Verified",
+            description: "Please verify your email address before logging in. Check your inbox for the verification link.",
+            variant: "destructive",
+          })
+        } else {
+          toast({
+            title: "Login Error",
+            description: "An error occurred during login. Please try again later.",
+            variant: "destructive",
+          })
+        }
+      }
+    } finally {
       setIsLoading(false)
     }
   }
@@ -105,6 +142,41 @@ export function AuthModal({ isOpen, onClose, defaultTab = "login" }: AuthModalPr
       onClose()
     } catch (error) {
       console.error("Registration error:", error)
+      // Handle specific error cases
+      if (error instanceof Error) {
+        if (error.message.includes("Email already exists")) {
+          toast({
+            title: "Email Already Exists",
+            description: "An account with this email already exists. Please try logging in instead.",
+            variant: "destructive",
+          })
+        } else if (error.message.includes("Username already exists")) {
+          toast({
+            title: "Username Taken",
+            description: "This username is already taken. Please choose a different one.",
+            variant: "destructive",
+          })
+        } else if (error.message.includes("Invalid email format")) {
+          toast({
+            title: "Invalid Email",
+            description: "Please enter a valid email address.",
+            variant: "destructive",
+          })
+        } else if (error.message.includes("Password too weak")) {
+          toast({
+            title: "Weak Password",
+            description: "Password is too weak. Please use a stronger password with at least 8 characters, including numbers and special characters.",
+            variant: "destructive",
+          })
+        } else {
+          toast({
+            title: "Registration Error",
+            description: "An error occurred during registration. Please try again later.",
+            variant: "destructive",
+          })
+        }
+      }
+    } finally {
       setIsLoading(false)
     }
   }
