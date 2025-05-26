@@ -29,10 +29,28 @@ export default function Header() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login")
   const [mounted, setMounted] = useState(false)
 
-  // Handle mounting state
+  // Handle mounting state and initial theme
   useEffect(() => {
     setMounted(true)
-  }, [])
+    // Set initial theme to system if not already set
+    if (!localStorage.getItem('theme')) {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      setTheme(systemTheme)
+    }
+  }, [setTheme])
+
+  // Listen for system theme changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem('theme')) {
+        setTheme(e.matches ? 'dark' : 'light')
+      }
+    }
+
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [setTheme])
 
   // Close sidebar when clicking outside on mobile
   const handleOutsideClick = useCallback((e: MouseEvent) => {
@@ -91,7 +109,9 @@ export default function Header() {
   }
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark")
+    const newTheme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(newTheme)
+    localStorage.setItem('theme', newTheme)
   }
 
   // Render theme toggle button only after mounting
