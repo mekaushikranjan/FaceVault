@@ -162,6 +162,19 @@ export default function Home() {
     }
   }, [])
 
+  // Add event listener for showing auth modal
+  useEffect(() => {
+    const handleShowAuthModal = (event: CustomEvent) => {
+      setActiveTab(event.detail.defaultTab || 'login')
+      setShowAuthModal(true)
+    }
+
+    window.addEventListener('showAuthModal', handleShowAuthModal as EventListener)
+    return () => {
+      window.removeEventListener('showAuthModal', handleShowAuthModal as EventListener)
+    }
+  }, [])
+
   const handleLoginClick = () => {
     setActiveTab("login")
     setShowAuthModal(true)

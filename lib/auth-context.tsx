@@ -24,6 +24,7 @@ interface AuthContextType {
   updateUser: (user: User) => void
   verifyEmail: (email: string, otp: string) => Promise<void>
   resendVerification: (email: string) => Promise<void>
+  showAuthModal: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -35,6 +36,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const { toast } = useToast()
+
+  // Create a custom event for showing auth modal
+  const showAuthModal = () => {
+    const event = new CustomEvent('showAuthModal', { detail: { defaultTab: 'login' } })
+    window.dispatchEvent(event)
+  }
 
   const fetchUser = async () => {
     try {
@@ -90,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const isProtectedRoute = protectedRoutes.some((route) => pathname?.startsWith(route))
 
     if (isProtectedRoute && !user) {
-      router.push("/")
+      showAuthModal()
       toast({
         title: "Authentication required",
         description: "Please log in to access this page",
@@ -327,6 +334,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     updateUser,
     verifyEmail,
     resendVerification,
+    showAuthModal,
   }
 
   return (
