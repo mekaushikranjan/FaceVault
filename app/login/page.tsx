@@ -34,7 +34,8 @@ const registerSchema = z
 export default function LoginPage() {
   const { login, register } = useAuth()
   const [activeTab, setActiveTab] = useState("login")
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const [isRegistering, setIsRegistering] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Login form state
@@ -53,7 +54,7 @@ export default function LoginPage() {
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+    setIsLoggingIn(true)
     setErrors({})
 
     try {
@@ -72,13 +73,13 @@ export default function LoginPage() {
     } catch (error) {
       console.error("Login error:", error)
     } finally {
-      setIsLoading(false)
+      setIsLoggingIn(false)
     }
   }
 
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+    setIsRegistering(true)
     setErrors({})
 
     try {
@@ -97,7 +98,7 @@ export default function LoginPage() {
     } catch (error) {
       console.error("Registration error:", error)
     } finally {
-      setIsLoading(false)
+      setIsRegistering(false)
     }
   }
 
@@ -134,7 +135,7 @@ export default function LoginPage() {
                     value={loginForm.email}
                     onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
                     className="bg-background border-border"
-                    disabled={isLoading}
+                    disabled={isLoggingIn}
                   />
                   {errors.email && <p className="text-destructive text-sm">{errors.email}</p>}
                 </div>
@@ -152,12 +153,12 @@ export default function LoginPage() {
                     value={loginForm.password}
                     onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                     className="bg-background border-border"
-                    disabled={isLoading}
+                    disabled={isLoggingIn}
                   />
                   {errors.password && <p className="text-destructive text-sm">{errors.password}</p>}
                 </div>
-                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
-                  {isLoading ? (
+                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoggingIn}>
+                  {isLoggingIn ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Logging in...
@@ -178,7 +179,7 @@ export default function LoginPage() {
                     value={registerForm.username}
                     onChange={(e) => setRegisterForm({ ...registerForm, username: e.target.value })}
                     className="bg-background border-border"
-                    disabled={isLoading}
+                    disabled={isRegistering}
                   />
                   {errors.username && <p className="text-destructive text-sm">{errors.username}</p>}
                 </div>
@@ -191,7 +192,7 @@ export default function LoginPage() {
                     value={registerForm.email}
                     onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
                     className="bg-background border-border"
-                    disabled={isLoading}
+                    disabled={isRegistering}
                   />
                   {errors.email && <p className="text-destructive text-sm">{errors.email}</p>}
                 </div>
@@ -204,7 +205,7 @@ export default function LoginPage() {
                     value={registerForm.password}
                     onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
                     className="bg-background border-border"
-                    disabled={isLoading}
+                    disabled={isRegistering}
                   />
                   {errors.password && <p className="text-destructive text-sm">{errors.password}</p>}
                 </div>
@@ -217,12 +218,12 @@ export default function LoginPage() {
                     value={registerForm.confirmPassword}
                     onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
                     className="bg-background border-border"
-                    disabled={isLoading}
+                    disabled={isRegistering}
                   />
                   {errors.confirmPassword && <p className="text-destructive text-sm">{errors.confirmPassword}</p>}
                 </div>
-                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
-                  {isLoading ? (
+                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isRegistering}>
+                  {isRegistering ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Creating account...

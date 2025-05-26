@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
+import { Loader2 } from "lucide-react"
 
 export default function VerifyEmailPage() {
   const searchParams = useSearchParams()
@@ -15,7 +16,8 @@ export default function VerifyEmailPage() {
   const { toast } = useToast()
   const email = searchParams.get("email")
   const [otp, setOtp] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [isResending, setIsResending] = useState(false)
   const { verifyEmail, resendVerification } = useAuth()
 
   if (!email) {
@@ -49,7 +51,7 @@ export default function VerifyEmailPage() {
       return
     }
 
-    setIsSubmitting(true)
+    setIsVerifying(true)
     try {
       await verifyEmail(email, otp)
       toast({
@@ -64,19 +66,23 @@ export default function VerifyEmailPage() {
         variant: "destructive",
       })
     } finally {
-      setIsSubmitting(false)
+      setIsVerifying(false)
     }
   }
 
   const handleResendOTP = async () => {
-    setIsSubmitting(true)
+    setIsResending(true)
     try {
       await resendVerification(email)
       setOtp("")
+      toast({
+        title: "Verification code sent",
+        description: "Please check your email for the new verification code",
+      })
     } catch (error) {
       // Error is handled by the auth context
     } finally {
-      setIsSubmitting(false)
+      setIsResending(false)
     }
   }
 
@@ -104,24 +110,39 @@ export default function VerifyEmailPage() {
                 pattern="[0-9]*"
                 inputMode="numeric"
                 autoComplete="one-time-code"
+                disabled={isVerifying || isResending}
               />
             </div>
             <div className="space-y-2">
               <Button
                 type="submit"
                 className="w-full"
-                disabled={isSubmitting || otp.length !== 6}
+                disabled={isVerifying || isResending || otp.length !== 6}
               >
-                {isSubmitting ? "Verifying..." : "Verify Email"}
+                {isVerifying ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  "Verify Email"
+                )}
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 className="w-full"
                 onClick={handleResendOTP}
-                disabled={isSubmitting}
+                disabled={isVerifying || isResending}
               >
-                Resend Code
+                {isResending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Resending...
+                  </>
+                ) : (
+                  "Resend Code"
+                )}
               </Button>
             </div>
           </form>

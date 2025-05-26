@@ -109,7 +109,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [isLoading, user, pathname, router, toast])
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true)
     try {
       const response = await fetch("/api/token", {
         method: "POST",
@@ -152,10 +151,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: "Welcome back!",
       })
 
-      // Redirect to verification if not verified
-      if (!userData.is_verified) {
+      // Only redirect if not already on verification page
+      if (!userData.is_verified && !window.location.pathname.includes('/verify-email')) {
         router.push(`/verify-email?email=${encodeURIComponent(userData.email)}`)
-      } else {
+      } else if (userData.is_verified && window.location.pathname === '/login') {
         router.push("/")
       }
     } catch (error) {
@@ -165,8 +164,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         variant: "destructive",
       })
       throw error
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -197,7 +194,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: "Please check your email for verification code",
       })
 
-      router.push(`/verify-email?email=${encodeURIComponent(email)}`)
+      // Only redirect if not already on verification page
+      if (!window.location.pathname.includes('/verify-email')) {
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`)
+      }
     } catch (error) {
       toast({
         title: "Registration failed",
@@ -250,7 +250,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: "Your email has been verified successfully",
       })
 
-      router.push("/login")
+      // Only redirect if not already on login page
+      if (!window.location.pathname.includes('/login')) {
+        router.push("/login")
+      }
     } catch (error) {
       toast({
         title: "Verification failed",
@@ -295,15 +298,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const logout = () => {
+    // Clear all auth data
     localStorage.removeItem("token")
     localStorage.removeItem("user")
     setUser(null)
-    router.push("/")
-
+    setIsAuthenticated(false)
+    
     toast({
       title: "Logged out",
       description: "You have been successfully logged out",
     })
+    // Force a hard reload to clear all state
+    window.location.href = "/"
   }
 
   const updateUser = (updatedUser: User) => {
@@ -325,13 +331,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {isLoading ? (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-        </div>
-      ) : (
-        children
-      )}
+      {children}
     </AuthContext.Provider>
   )
 }
