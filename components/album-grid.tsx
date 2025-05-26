@@ -75,7 +75,7 @@ export default function AlbumGrid({
             onClick={(e) => handleAlbumClick(album.id, e)}
             className={requiresAuth ? "cursor-pointer" : ""}
           >
-            <Card className="bg-black border-gray-700 overflow-hidden hover:border-white/20 transition-colors">
+            <Card className="bg-background border-border overflow-hidden hover:border-primary/20 transition-colors">
               <div className="aspect-video relative">
                 {albumCovers[album.id] ? (
                   <Image 
@@ -85,15 +85,15 @@ export default function AlbumGrid({
                     className="object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-800">
-                    <span className="text-2xl text-gray-400">{album.name}</span>
+                  <div className="w-full h-full flex items-center justify-center bg-muted">
+                    <span className="text-2xl text-muted-foreground">{album.name}</span>
                   </div>
                 )}
               </div>
               <CardContent className="p-4">
-                <h3 className="text-lg font-medium text-white truncate">{album.name}</h3>
-                <p className="text-gray-300 text-sm">{album.imageCount} photos</p>
-                {album.description && <p className="text-gray-400 text-sm mt-1 line-clamp-2">{album.description}</p>}
+                <h3 className="text-lg font-medium text-foreground truncate">{album.name}</h3>
+                <p className="text-muted-foreground text-sm">{album.imageCount} photos</p>
+                {album.description && <p className="text-muted-foreground text-sm mt-1 line-clamp-2">{album.description}</p>}
               </CardContent>
             </Card>
           </Link>
